@@ -1,0 +1,50 @@
+name: Node.js CI/CD with Docker
+
+on:
+    push:
+        branches: ["main"]
+
+jobs:
+    # -------------------------------------------------------
+    # ขั้นตอนที่ 1: CI (Continuous Integration) - ตรวจสอบความถูกต้อง
+    # -------------------------------------------------------
+    build-and-test:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-level: "20"
+                  cache: "npm"
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Run Tests
+              run: npm test
+
+              # -------------------------------------------------------
+                # ขั้นตอนที่ 2: CD (Continuous Deployment) - เอาขึ้นเซิร์ฟเวอร์จริง
+                # -------------------------------------------------------
+    deploy:
+        needs: build-and-test # ต้องผ่านขั้นตอนแรกก่อน ถึงจะเริ่มทำขั้นตอนนี้ได้
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              
+                  # ตัวอย่างการ Deploy แบบง่ายและนิยมที่สุด: รีโมทข้ามไปสั่งงานที่ Server ปลายทางด้วย SSH
+            - name: Deploy to Server via SSH
+              uses: appleboy/ssh-action@v1.0.3
+              with:
+                  host: ${{ secrets.SERVER_IP }}         # ไอพีเซิร์ฟเวอร์จริงของคุณ (ซ่อนไว้ใน GitHub Secrets)
+                  username: ${{ secrets.SERVER_USER }}     # ชื่อ User เช่น root / ubuntu
+                  key: ${{ secrets.SERVER_SSH_KEY }}       # SSH Key สำหรับเข้าเซิร์ฟเวอร์
+                  script: |
+                        cd /path/to/your/project
+                        git pull origin main
+                        docker compose down
+                        docker compose up -d --build
