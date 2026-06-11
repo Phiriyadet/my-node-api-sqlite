@@ -1,5 +1,5 @@
-const { app, PORT } = require("./app");
-const sequelize = require("./models");
+const { app, PORT } = require("./src/app");
+const sequelize = require("./src/models");
 // Connect SQlite
 sequelize
   .sync({ alter: true })

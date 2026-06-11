@@ -20,7 +20,7 @@ const options = {
     },
     servers: [{ url: `http://localhost:${PORT}` }],
   },
-  apis: ["./app.js"], // Swagger docs ตรงนี้
+  apis: ["./src/app.js"], // Swagger docs ตรงนี้
 };
 const swaggerSpec = swaggerJsdoc(options);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -38,14 +38,28 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  * @swagger
  * /:
  *   get:
+ *     summary: Root endpoint
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: Returns welcome message
+ */
+app.get("/", (req, res) => {
+  res.json({ ok: true, message: "Node.js + Docker demo running 🚀" });
+});
+
+/**
+ * @swagger
+ * /health:
+ *   get:
  *     summary: Health check
  *     tags: [Health]
  *     responses:
  *       200:
- *         description: Returns OK message
+ *         description: Returns app status and uptime
  */
-app.get("/", (req, res) => {
-  res.json({ ok: true, message: "Node.js + Docker demo running 🚀" });
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", uptime: process.uptime() });
 });
 
 /**

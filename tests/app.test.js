@@ -2,9 +2,9 @@
 process.env.IN_MEMORY_DB = "true";
 
 const request = require("supertest");
-const { app } = require("../app");
-const sequelize = require("../models");
-const User = require("../models/user");
+const { app } = require("../src/app");
+const sequelize = require("../src/models");
+const User = require("../src/models/user");
 
 // Run before all tests
 beforeAll(async () => {
